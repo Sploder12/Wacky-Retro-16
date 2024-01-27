@@ -179,7 +179,7 @@ bool loadTextureResource(const std::filesystem::path& path, TextureManager& mana
 		auto img = sndx::imageFromFile(file.c_str());
 
 		if (img.has_value()) {
-			manager.addTexture(std::move(id), sndx::textureFromImage(std::move(*img)));
+			manager.addTexture(std::move(id), sndx::textureFromImage(std::move(*img), GL_RGBA, GL_NEAREST));
 		}
 	}
 

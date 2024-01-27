@@ -1,0 +1,8 @@
+{
+  "bgm": "bgm.wav",
+
+  "idle": "idle_loop.mp3",
+  "accelerate": "accelerate.mp3",
+  "decelerate": "decelerate.mp3",
+  "redline": "redline_loop.mp3"
+}

@@ -88,7 +88,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -103,7 +103,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -122,7 +122,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
@@ -137,7 +137,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level1</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -156,23 +156,37 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\resource\resourcestate.cpp" />
     <ClCompile Include="src\resource\shadermanager.cpp" />
     <ClCompile Include="src\resource\texturemanager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\gamestate.hpp" />
     <ClInclude Include="src\render\render.hpp" />
+    <ClInclude Include="src\resource\audiomanager.hpp" />
     <ClInclude Include="src\resource\resourcestate.hpp" />
     <ClInclude Include="src\resource\shadermanager.hpp" />
     <ClInclude Include="src\resource\texturemanager.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="resources\shaders\post.fs" />
+    <None Include="resources\shaders\post.vs" />
     <None Include="resources\shaders\sprite.fs" />
     <None Include="resources\shaders\sprite.vs" />
+    <None Include="resources\sounds.json" />
     <None Include="resources\sprites.json" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\endorsement.png" />
+    <Image Include="resources\textures\ground.png" />
+    <Image Include="resources\textures\intro.png" />
+    <Image Include="resources\textures\truck_frame_0.png" />
+    <Image Include="resources\textures\truck_frame_1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="resources\sounds\accelerate.mp3" />
+    <Media Include="resources\sounds\decelerate.mp3" />
+    <Media Include="resources\sounds\idle_loop.mp3" />
+    <Media Include="resources\sounds\redline_loop.mp3" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\resource\resourcestate.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\resource\shadermanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -41,15 +38,42 @@
     <ClInclude Include="src\render\render.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\gamestate.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\resource\audiomanager.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\sprite.vs" />
     <None Include="resources\shaders\sprite.fs" />
     <None Include="resources\sprites.json" />
+    <None Include="resources\shaders\post.fs" />
+    <None Include="resources\shaders\post.vs" />
+    <None Include="resources\sounds.json" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\endorsement.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\textures\intro.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\truck_frame_0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\truck_frame_1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\ground.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="resources\sounds\accelerate.mp3" />
+    <Media Include="resources\sounds\decelerate.mp3" />
+    <Media Include="resources\sounds\idle_loop.mp3" />
+    <Media Include="resources\sounds\redline_loop.mp3" />
   </ItemGroup>
 </Project>
