@@ -44,6 +44,9 @@
     <ClInclude Include="src\resource\audiomanager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\sprite.vs" />
@@ -52,6 +55,7 @@
     <None Include="resources\shaders\post.fs" />
     <None Include="resources\shaders\post.vs" />
     <None Include="resources\sounds.json" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\endorsement.png">
@@ -69,11 +73,56 @@
     <Image Include="resources\textures\ground.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\textures\credits.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\console.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\cartridge.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\lamp_on_table.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\silly.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\tv_on_table.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\bg.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\game_over.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\game_over_txt.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\instructions.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="resources\sounds\accelerate.mp3" />
     <Media Include="resources\sounds\decelerate.mp3" />
     <Media Include="resources\sounds\idle_loop.mp3" />
     <Media Include="resources\sounds\redline_loop.mp3" />
+    <Media Include="resources\sounds\bgm.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="resources\sounds\goyttttaagoottaage_loopable.mp3" />
+    <Media Include="resources\sounds\limiter.mp3" />
+    <Media Include="resources\sounds\real_v8.mp3" />
+    <Media Include="resources\sounds\OH_NO.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Wacky Retro 16.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

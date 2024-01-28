@@ -12,9 +12,16 @@ struct ResourceState {
 	void clear() {
 		shaders.clear();
 		textures.clear();
+
+		sounds.bgm.stop();
+		sounds.bgm.destroy();
+
+		sounds.carNoises.stop();
+		sounds.carNoises.destroy();
+
 		sounds.clear();
+
+		sounds.context.buffers.clear();
+		sounds.context.sources.clear();
 	}
 };
-
-// this MUST be done on the render thread. Thanks OpenGL
-void init(ResourceState& state);

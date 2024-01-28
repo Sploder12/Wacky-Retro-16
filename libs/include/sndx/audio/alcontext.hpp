@@ -63,11 +63,11 @@ namespace sndx {
 		explicit ALContext(const ALCchar* deviceName = nullptr, const ALCint* attrList = nullptr) :
 			device(alcOpenDevice(deviceName)), buffers({}), sources({}) {
 
-			if (device == nullptr) throw std::runtime_error("OpenAL failed to open device.");
+			if (device == nullptr) return;
 
 			context = alcCreateContext(device, attrList);
 
-			if (context == nullptr) throw std::runtime_error("OpenAL failed to create context.");
+			if (context == nullptr) return;
 		}
 
 		ALContext(ALContext&& other) noexcept:
@@ -123,8 +123,12 @@ namespace sndx {
 		template <typename T> [[nodiscard]]
 		ABO createBuffer(const IdT& id, const AudioData<T>& data) {
 			ABO out{};
-			out.setData(ALenum(data.format), std::span(data.buffer), data.freq);
-			buffers.emplace(id, out);
+
+			if (context != nullptr) {
+				out.setData(ALenum(data.format), std::span(data.buffer), data.freq);
+				buffers.emplace(id, out);
+			}
+
 			return out;
 		}
 
@@ -154,13 +158,19 @@ namespace sndx {
 		[[nodiscard]]
 		ALSource createSource(const IdT& id) {
 			ALSource out{};
-			out.gen();
-			sources.emplace(id, out);
+
+			if (context != nullptr) {
+				out.gen();
+				sources.emplace(id, out);
+			}
+
 			return out;
 		}
 
 		const auto& setVolume(float gain) const {
-			alListenerf(AL_GAIN, gain);
+			if (context != nullptr) {
+				alListenerf(AL_GAIN, gain);
+			}
 			return *this;
 		}
 

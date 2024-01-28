@@ -1,13 +1,29 @@
 {
   "endorsement": "endorsement.png",
 
+  "credits": "credits.png",
+
   "truck": {
     "0": "truck_frame_0.png",
     "1": "truck_frame_1.png"
   },
 
+  "console": {
+    "console": "console.png",
+    "cartridge": "cartridge.png",
+    "tv": "tv_on_table.png",
+    "lamp": "lamp_on_table.png"
+  },
+
   "obstacle": {
     "none": "ground.png",
-    "barrier": "endorsement.png"
-  }
+    "barrier": "endorsement.png",
+    "silly": "silly.png"
+  },
+
+  "death": "game_over.png",
+  "game_over": "game_over_txt.png",
+
+  "any_key": "instructions.png",
+  "bg": "bg.png"
 }

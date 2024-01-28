@@ -3,11 +3,15 @@
 
 #include <sndx/render/vbo.hpp>
 
+#include <sndx/render/imagedata.hpp>
+
 #include <thread>
 
 #include "render/render.hpp"
 
 #include "resource/resourcestate.hpp"
+
+
 
 ResourceState resources{};
 
@@ -40,7 +44,65 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 
 void mouse_callback(GLFWwindow* window, int button, int action, int mods) {
 	if (action == GLFW_PRESS) {
-		// @TODO
+
+		if (state.state == State::Credits) {
+			state.state = State::Menu;
+		}
+		else if (state.state == State::Menu) {
+			// NOTHING
+		}
+		else if (state.state == State::Game) {
+			// @TODO
+		}
+	}
+}
+
+bool lrotating = false;
+bool rrotating = false;
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (action == GLFW_PRESS) {
+		if (state.state == State::Credits) {
+			state.state = State::Menu;
+		}
+		else if (state.state == State::Menu) {
+			if (key == GLFW_KEY_C) {
+				state.state = State::Credits;
+			}
+			else {
+				state.state = State::Game;
+				state.start(resources);
+			}
+		}
+		else if (state.state == State::Game) {
+			if (key == GLFW_KEY_SPACE) {
+				if (!state.hovering) {
+					state.velocity.y = 1.0f;
+
+					resources.sounds.carNoises.stop();
+					resources.sounds.carNoises.setBuffer(resources.sounds["limiter"]);
+					resources.sounds.carNoises.setParam(AL_LOOPING, AL_FALSE).setSpeed(1.0).play();
+
+					state.hovering = true;
+				}
+			}
+			else if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
+				lrotating = true;
+			}
+			else if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+				rrotating = true;
+			}
+		}
+	}
+	else if (action == GLFW_RELEASE) {
+		if (state.state == State::Game) {
+			if (key == GLFW_KEY_LEFT || key == GLFW_KEY_A) {
+				lrotating = false;
+			}
+			else if (key == GLFW_KEY_RIGHT || key == GLFW_KEY_D) {
+				rrotating = false;
+			}
+		}
 	}
 }
 
@@ -61,12 +123,19 @@ float bounceInEasing(float x) {
 	return n1 * (x -= 2.625f / d1) * x + 0.984375f;
 }
 
-int main() {
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+	
+	
+	
+
 
 	
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
@@ -79,10 +148,24 @@ int main() {
 
 	
 
-	window = sndx::createWindow(1, 1, "Wacky Retro 16", float(mWidth) / float(mHeight));
+	window = sndx::createWindow(1, 1, "EXTREME OFF-ROAD HILL CHALLENGE", float(mWidth) / float(mHeight));
 	glfwMakeContextCurrent(window);
 
 	glfwSetWindowPos(window, int((mWidth / 2) - (window.dims.x / 2)), int((mHeight / 2) - (window.dims.y / 2)));
+
+
+	auto icoO = sndx::imageFromFile("resources/textures/truck_frame_0.png", 4, false);
+	if (icoO.has_value()) {
+		GLFWimage img;
+		img.width = icoO->width;
+		img.height = icoO->height;
+		img.pixels = icoO->data.data();
+		icoO->data.clear();
+
+
+		glfwSetWindowIcon(window, 1, &img);
+	}
+
 
 	glewInit();
 
@@ -92,7 +175,7 @@ int main() {
 
 	resources.textures.loadTexture("intro", "resources/textures/intro.png");
 
-	bool intro = true;
+	static constexpr bool intro = true;
 
 	if (intro) {
 		for (float percent = 0.01f; percent <= 1.0f; percent += 0.01f) {
@@ -144,14 +227,16 @@ int main() {
 	loadTextureResource("resources/sprites.json", resources.textures);
 	loadAudioResource("resources/sounds.json", resources.sounds);
 
-	generateTrack(state.track, 64);
 	// PLEASE
+	resources.sounds.bgm.setGain(0.75f);
+	resources.sounds.setBGM("menu");
 
 	if (intro) {
-		while (glfwGetTime() - start < 1.0 && !glfwWindowShouldClose(window)) { // we do a little loading screen
-			const auto& intro = resources.textures.getTexture("intro");
-			intro.bind();
+		const auto& intro = resources.textures.getTexture("intro");
+		intro.bind();
 
+		while (glfwGetTime() - start < 1.0 && !glfwWindowShouldClose(window)) { // we do a little loading screen
+		
 			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
 			glfwSwapBuffers(window);
 			glfwPollEvents();
@@ -159,13 +244,13 @@ int main() {
 
 		for (float percent = 1.0f; percent >= 0.0f && !glfwWindowShouldClose(window); percent -= 0.005f) {
 
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			SpriteData data{
-				glm::scale(glm::mat4(1.0f), glm::vec3(2.0f)),
+				glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(glm::vec3(-0.21f, 0.3f, 0.0f), glm::vec3(0.0), percent)), glm::mix(glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(2.0), percent)),
 				resources.textures.getTexcoords("intro"),
-				glm::vec4(percent)
+				glm::vec4(1.0)
 			};
 
 			spriteVBO.setData(std::array<SpriteData, 1>{ data });
@@ -177,22 +262,14 @@ int main() {
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 		}
-
-		start = glfwGetTime();
-		while (glfwGetTime() - start < 1.0 && !glfwWindowShouldClose(window)) {
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		}
 	}
 
 	// setup callbacks
 
 	glfwSetCursorPosCallback(window, cursor_position_callback);
 	glfwSetMouseButtonCallback(window, mouse_callback);
+	glfwSetKeyCallback(window, key_callback);
 
-	resources.sounds.setBGM("bgm");
 	resources.sounds.setSpeed(1.0);
 
 	double prev = glfwGetTime();
@@ -208,12 +285,26 @@ int main() {
 		double dt = std::min(now - prev, 0.1);
 		prev = now;
 
-		if (now - skipTimer >= 0.2) {
+		if (state.audioSkipping && now - skipTimer >= 0.2) {
 			resources.sounds.bgmSkip(-(now - skipTimer) * 0.99);
 			skipTimer = now;
 		}
 
-		state.update(dt);
+		if (lrotating && !rrotating) {
+			state.rotation += 60.0f * dt;
+		}
+		else if (rrotating && !lrotating) {
+			state.rotation -= 60.0f * dt;
+		}
+
+		if (state.rotation > 180.0f) {
+			state.rotation = -180.0;
+		}
+		else if (state.rotation < -180.0f) {
+			state.rotation = 180.0;
+		}
+
+		state.update(dt, resources);
 		render(state, resources, now);
 
 		glfwSwapBuffers(window);
@@ -222,6 +313,10 @@ int main() {
 		glFinish();
 	}
 	
+
+	resources.clear();
+
+	glfwTerminate();
 
 	return 0;
 }

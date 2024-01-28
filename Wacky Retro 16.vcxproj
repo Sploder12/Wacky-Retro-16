@@ -96,7 +96,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>freetype.lib;glew32.lib;glfw3.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -113,7 +113,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -130,7 +130,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>freetype.lib;glew32.lib;glfw3.lib;OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -147,7 +147,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -160,6 +160,7 @@
     <ClCompile Include="src\resource\texturemanager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\gamestate.hpp" />
     <ClInclude Include="src\render\render.hpp" />
     <ClInclude Include="src\resource\audiomanager.hpp" />
@@ -168,6 +169,7 @@
     <ClInclude Include="src\resource\texturemanager.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="README.md" />
     <None Include="resources\shaders\post.fs" />
     <None Include="resources\shaders\post.vs" />
     <None Include="resources\shaders\sprite.fs" />
@@ -176,17 +178,36 @@
     <None Include="resources\sprites.json" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="icon.ico" />
+    <Image Include="resources\textures\bg.png" />
+    <Image Include="resources\textures\cartridge.png" />
+    <Image Include="resources\textures\console.png" />
+    <Image Include="resources\textures\credits.png" />
     <Image Include="resources\textures\endorsement.png" />
+    <Image Include="resources\textures\game_over.png" />
+    <Image Include="resources\textures\game_over_txt.png" />
     <Image Include="resources\textures\ground.png" />
+    <Image Include="resources\textures\instructions.png" />
     <Image Include="resources\textures\intro.png" />
+    <Image Include="resources\textures\lamp_on_table.png" />
+    <Image Include="resources\textures\silly.png" />
     <Image Include="resources\textures\truck_frame_0.png" />
     <Image Include="resources\textures\truck_frame_1.png" />
+    <Image Include="resources\textures\tv_on_table.png" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="resources\sounds\accelerate.mp3" />
+    <Media Include="resources\sounds\bgm.wav" />
     <Media Include="resources\sounds\decelerate.mp3" />
+    <Media Include="resources\sounds\goyttttaagoottaage_loopable.mp3" />
     <Media Include="resources\sounds\idle_loop.mp3" />
+    <Media Include="resources\sounds\limiter.mp3" />
+    <Media Include="resources\sounds\OH_NO.mp3" />
+    <Media Include="resources\sounds\real_v8.mp3" />
     <Media Include="resources\sounds\redline_loop.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Wacky Retro 16.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

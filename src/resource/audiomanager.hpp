@@ -24,7 +24,7 @@ public:
 		bgm.setPos(glm::vec3(0.0f));
 		carNoises.setPos(glm::vec3(0.0f));
 
-		context.setVolume(0.3);
+		context.setVolume(0.4);
 
 		bgm.setParam(AL_LOOPING, AL_TRUE);
 	}
@@ -35,6 +35,8 @@ public:
 	}
 
 	void setBGM(const std::string& id) {
+		bgm.stop();
+
 		bgm.setBuffer(this->at(id)).play();
 	}
 
@@ -67,6 +69,8 @@ inline bool loadAudioResource(const std::filesystem::path& path, AudioManager& m
 				auto ret = sndx::loadAudioFile("resources/sounds/" + std::get<std::string>(prim.data));
 
 				if (ret.has_value()) {
+					ret->normalize();
+					
 					sndx::ABO abo{};
 
 					abo.setData(ALenum(ret->format), std::span<short>{ret->buffer.begin(), ret->buffer.size()}, ret->freq);
