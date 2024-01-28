@@ -93,6 +93,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 				rrotating = true;
 			}
 		}
+		else {
+			lrotating = false;
+			rrotating = false;
+		}
 	}
 	else if (action == GLFW_RELEASE) {
 		if (state.state == State::Game) {
