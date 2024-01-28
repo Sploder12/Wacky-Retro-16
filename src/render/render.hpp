@@ -256,7 +256,7 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
 
     resources.textures.getTexture("death.ItHasNeverBeenMoreOver").bind();
 
-    if (state.state != State::GameOver) {
+    if (state.state != State::GameOver && state.state != State::Credits) {
         SpriteData data{
             glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.7, -0.165, 0.0)), glm::vec3(0.1f)),
             resources.textures.getTexcoords("death.truck"),
