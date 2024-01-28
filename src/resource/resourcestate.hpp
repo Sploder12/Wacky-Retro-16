@@ -19,6 +19,9 @@ struct ResourceState {
 		sounds.carNoises.stop();
 		sounds.carNoises.destroy();
 
+		sounds.sfx.stop();
+		sounds.sfx.destroy();
+
 		sounds.clear();
 
 		sounds.context.buffers.clear();

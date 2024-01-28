@@ -65,32 +65,9 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
 
     resources.shaders.getShader("sprite").use();
 
-    resources.textures.getTexture("death").bind();
-
     double truckTime = 1.5;
 
-    if (state.state == State::GameOver) {
-        double progress = std::min((state.timer / truckTime) * (state.timer / truckTime), 1.0);
-
-        SpriteData data{
-            glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(glm::vec3(0.7, -0.165, 0.0), glm::vec3(0.0), 0.0)), glm::mix(glm::vec3(0.1), glm::vec3(2.0f), progress)),
-            resources.textures.getTexcoords("death"),
-            glm::vec4(1.0f)
-        };
-
-        spriteVBO.setData(std::array<SpriteData, 1>{ data });
-    }
-    else {
-        SpriteData data{
-            glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.7, -0.165, 0.0)), glm::vec3(0.1f)),
-            resources.textures.getTexcoords("death"),
-            glm::vec4(1.0f)
-        };
-
-        spriteVBO.setData(std::array<SpriteData, 1>{ data });
-    }
-
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+    
 
     if (state.state == State::Game || state.state == State::GameOver) {
         glBindFramebuffer(GL_FRAMEBUFFER, gameFBO);
@@ -122,7 +99,7 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
 
             if (ob == Obstacle::Pit) continue;
 
-            auto delta = float(x) - state.pos.x;
+            auto delta = float(x) - (state.pos.x);
 
             obstacles.emplace_back(
                 glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-0.8f + delta * 0.2f, -1.0f + 0.05f, state.pos.z)), glm::vec3(0.2f, 0.2f, 1.0)),
@@ -275,38 +252,72 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, home.size());
     }
 
+
+
+    resources.textures.getTexture("death.ItHasNeverBeenMoreOver").bind();
+
+    if (state.state != State::GameOver) {
+        SpriteData data{
+            glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.7, -0.165, 0.0)), glm::vec3(0.1f)),
+            resources.textures.getTexcoords("death.truck"),
+            glm::vec4(1.0f)
+        };
+
+        spriteVBO.setData(std::array<SpriteData, 1>{ data });
+
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+    }
+
     if (state.state == State::GameOver) {
         
         double progress = std::min((state.timer / truckTime) * (state.timer / truckTime), 1.0);
 
         resources.sounds.carNoises.setGain(progress);
 
+        std::vector<SpriteData> deathStuff{};
+
         if (state.timer >= truckTime && state.pos.y < 0.0) {
             state.pos.y = 5.0;
             resources.sounds.carNoises.stop();
         }
 
-        if (state.timer >= truckTime + 0.5 && state.pos.y == 5.0) {
+        if (state.timer >= truckTime - 0.4 && state.pos.y < -0.2 && state.pos.y > -10.0) {
+            state.pos.y = -10.1;
+
+            resources.sounds.sfx.stop();
+            resources.sounds.sfx.setBuffer(resources.sounds.at("glass"));
+            resources.sounds.sfx.setGain(1.0).setSpeed(1.0).play();
+        }
+
+        deathStuff.emplace_back(
+            glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(glm::vec3(0.7, -0.165, 0.0), glm::vec3(0.0), 0.0)), glm::mix(glm::vec3(0.1), glm::vec3(2.0f), progress)),
+            resources.textures.getTexcoords("death.truck"),
+            glm::vec4(1.0f)
+        );
+
+        if (state.timer >= truckTime) {
+            deathStuff.emplace_back(
+                glm::scale(glm::mat4(1.0f), glm::vec3(2.0f)),
+                resources.textures.getTexcoords("death.glass"),
+                glm::vec4(1.0f)
+            );
+        }
+
+        if (state.timer >= truckTime + 2.0 && state.pos.y == 5.0) {
             state.pos.y = 6.0;
 
             resources.sounds.carNoises.setBuffer(resources.sounds.at("oh_no")).setGain(1.0).setParam(AL_LOOPING, AL_FALSE).play();
         }
 
-        if (state.timer >= truckTime + 0.5) {
-            resources.textures.getTexture("game_over").bind();
-
-            SpriteData data{
+        if (state.timer >= truckTime + 2.0) {
+            deathStuff.emplace_back(
                 glm::scale(glm::mat4(1.0f), glm::vec3(2.0)),
-                glm::vec4(0.0, 0.0, 1.0, 1.0),
+                resources.textures.getTexcoords("death.game_over"),
                 glm::vec4(1.0f)
-            };
-
-            spriteVBO.setData(std::array<SpriteData, 1>{ data });
-
-            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+            );
         }
 
-        if (state.timer >= truckTime + 3.5) {
+        if (state.timer >= truckTime + 5.25) {
             state.reset();
             state.rotation = 0.0;
 
@@ -315,5 +326,9 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
             resources.sounds.bgm.setGain(0.75f);
             resources.sounds.setBGM("menu");
         }
+
+        spriteVBO.setData(deathStuff);
+
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, deathStuff.size());
     }
 }

@@ -14,15 +14,18 @@ public:
 
 	sndx::ALSource bgm{};
 	sndx::ALSource carNoises{};
+	sndx::ALSource sfx{};
 
 	AudioManager() {
 		context.bind();
 
 		bgm = context.createSource("bgm");
 		carNoises = context.createSource("car");
+		sfx = context.createSource("sfx");
 
 		bgm.setPos(glm::vec3(0.0f));
 		carNoises.setPos(glm::vec3(0.0f));
+		sfx.setPos(glm::vec3(0.0f));
 
 		context.setVolume(0.4);
 

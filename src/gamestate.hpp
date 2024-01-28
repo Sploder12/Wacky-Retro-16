@@ -114,6 +114,10 @@ struct Gamestate {
 		resources.sounds.bgm.setGain(0.5f);
 		resources.sounds.setBGM("bgm");
 
+		resources.sounds.sfx.stop();
+		resources.sounds.sfx.setBuffer(resources.sounds["start"]);
+		resources.sounds.sfx.setGain(1.0).setSpeed(1.0).play();
+
 
 		hovering = false;
 
