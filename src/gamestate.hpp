@@ -136,6 +136,22 @@ struct Gamestate {
 				timer = 0.0;
 				++animFrame;
 
+				static std::random_device rd;
+				static std::mt19937 gen(rd());
+
+				static std::uniform_real_distribution rotDistrib{0.0, 1.0};
+
+				if (std::abs(rotation) < 170.0) {
+					auto rot = rotDistrib(gen);
+
+					if (rotation > 0) {
+						rotation += rot;
+					}
+					else {
+						rotation -= rot;
+					}
+				}
+
 				if (std::abs(rotation) <= 5.0) {
 					tilted = false;
 					reset();
@@ -149,8 +165,7 @@ struct Gamestate {
 					}
 
 					if (animFrame % 21 == 0) {
-						static std::random_device rd;
-						static std::mt19937 gen(rd());
+						
 
 						static std::uniform_int_distribution<> distrib(0, 9);
 
