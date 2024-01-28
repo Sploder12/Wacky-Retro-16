@@ -4,13 +4,7 @@ in vec2 coords;
 
 uniform sampler2D atlas;
 
-uniform bool Edge;
-uniform bool Blur;
-uniform bool Posterize;
-uniform bool MegaWarp;
-uniform bool Warp;
-
-uniform bool Invert;
+uniform uint Flags;
 
 uniform float time;
 
@@ -22,6 +16,13 @@ const float offsetX = 1.0 / 800.0;
 const float offsetY = 1.0 / 600.0;  
 
 void main() {
+
+    bool Edge = (Flags & uint(1)) > uint(0);
+    bool Blur = (Flags & uint(2)) > uint(0);
+    bool Posterize = (Flags & uint(4)) > uint(0);
+    bool Warp = (Flags & uint(8)) > uint(0);
+    bool MegaWarp = (Flags & uint(16)) > uint(0);
+    bool Invert = (Flags & uint(32)) > uint(0);
 
     vec2 texCoords = coords;
 

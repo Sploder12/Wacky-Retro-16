@@ -294,6 +294,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			skipTimer = now;
 		}
 
+		if (state.state != State::Game) {
+			lrotating = false;
+			rrotating = false;
+		}
+
 		if (lrotating && !rrotating) {
 			state.rotation += 60.0f * dt;
 		}

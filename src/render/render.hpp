@@ -98,9 +98,6 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
         glClearColor(0.0f, 0.2f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-        resources.shaders.getShader("sprite").use();
-
         resources.textures.getTexture("bg").bind();
 
         SpriteData data{
@@ -173,13 +170,13 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
         auto& post = resources.shaders.getShader("post");
         post.use();
 
-        post.uniform("Edge", state.edging);
-        post.uniform("Blur", state.blurring);
-        post.uniform("Posterize", state.posterize);
-        post.uniform("Warp", state.warping);
-        post.uniform("MegaWarp", state.megaWarping);
-        post.uniform("Shake", state.shake);
-        post.uniform("Invert", state.invert);
+        unsigned int flags = (unsigned int)state.edging | ((unsigned int)state.blurring << 1) |
+            ((unsigned int)state.posterize << 2) | ((unsigned int)state.warping << 3) |
+            ((unsigned int)state.megaWarping << 4) | ((unsigned int)state.shake << 5) |
+            ((unsigned int)state.invert << 6);
+
+        post.uniform("Flags", flags);
+
 
         fboTexture.bind();
 
@@ -201,9 +198,6 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
         glClearColor(0.0f, 0.2f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-        resources.shaders.getShader("sprite").use();
-
         resources.textures.getTexture("credits").bind();
 
         SpriteData data{
@@ -217,7 +211,6 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
     }
     else if (state.state == State::Menu) {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
         resources.textures.getTexture("intro").bind();
 
@@ -245,13 +238,9 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
     }
     
     
-
+    resources.shaders.getShader("sprite").use();
     if (state.state == State::Game || state.state == State::Menu || state.state == State::GameOver) {
         
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        resources.shaders.getShader("sprite").use();
         resources.textures.getTexture("console.Gaming").bind();
         std::vector<SpriteData> home{};
         home.reserve(4);
@@ -291,10 +280,6 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
         double progress = std::min((state.timer / truckTime) * (state.timer / truckTime), 1.0);
 
         resources.sounds.carNoises.setGain(progress);
-
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-        resources.shaders.getShader("sprite").use();
 
         if (state.timer >= truckTime && state.pos.y < 0.0) {
             state.pos.y = 5.0;

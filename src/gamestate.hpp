@@ -124,7 +124,6 @@ struct Gamestate {
 	}
 
 	void update(double dt, ResourceState& resources) {
-		
 
 		if (state == State::Game) {
 			timer += dt;

@@ -72,7 +72,7 @@ namespace sndx {
 
 		void bind(size_t tex = 0) const {
 			assert(tex <= 31);
-			glActiveTexture(GLenum(GL_TEXTURE0 + tex));
+			//glActiveTexture(GLenum(GL_TEXTURE0 + tex));
 			glBindTexture(GL_TEXTURE_2D, id);
 		}
 
