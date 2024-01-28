@@ -21,8 +21,16 @@
     "silly": "silly.png"
   },
 
-  "death": "game_over.png",
-  "game_over": "game_over_txt.png",
+  "death": {
+    "truck": "game_over.png",
+    "game_over": "game_over_txt.png",
+    "glass": "glass_break.png"
+  },
+
+  "controls": {
+    "jump": "space_to_jump.png",
+    "tilt": "cartridge_controls.png"
+  },
 
   "any_key": "instructions.png",
   "bg": "bg.png"

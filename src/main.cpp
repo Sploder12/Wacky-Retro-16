@@ -246,11 +246,12 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			glfwPollEvents();
 		}
 
+		
 		for (float percent = 1.0f; percent >= 0.0f && !glfwWindowShouldClose(window); percent -= 0.005f) {
 
 			glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+			intro.bind();
 			SpriteData data{
 				glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(glm::vec3(-0.21f, 0.3f, 0.0f), glm::vec3(0.0), percent)), glm::mix(glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(2.0), percent)),
 				resources.textures.getTexcoords("intro"),
@@ -265,6 +266,69 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			glfwPollEvents();
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(5));
+		}
+
+		start = glfwGetTime() - resources.sounds.bgm.tell().count();
+
+		while (glfwGetTime() - start < 4.8 && !glfwWindowShouldClose(window)) { // we do a little loading screen
+
+			glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			intro.bind();
+			SpriteData data{
+				glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-0.21f, 0.3f, 0.0f)), glm::vec3(1.2f, 1.0f, 1.0f)),
+				resources.textures.getTexcoords("intro"),
+				glm::vec4(1.0)
+			};
+
+			spriteVBO.setData(std::array<SpriteData, 1>{ data });
+
+			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		}
+
+		while (glfwGetTime() - start < 9.7 && !glfwWindowShouldClose(window)) { // we do a little loading screen
+
+			glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			intro.bind();
+			SpriteData data{
+				glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-0.21f, 0.3f, 0.0f)), glm::vec3(1.2f, 1.0f, 1.0f)),
+				resources.textures.getTexcoords("intro"),
+				glm::vec4(1.0)
+			};
+
+			spriteVBO.setData(std::array<SpriteData, 1>{ data });
+
+			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+
+			resources.textures.getTexture("controls.WeAreSoBack").bind();
+			std::vector<SpriteData> controls{};
+
+			controls.emplace_back(
+				glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.f, 0.0f)), glm::vec3(1.0f, 1.0f, 1.0f)),
+				resources.textures.getTexcoords("controls.jump"),
+				glm::vec4(1.0)
+			);
+
+			//if (glfwGetTime() - start > glm::mix(4.8f, 9.7f, 0.5f)) {
+				controls.emplace_back(
+					glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, 0.0f)), glm::vec3(1.0f, 1.0f, 1.0f)),
+					resources.textures.getTexcoords("controls.tilt"),
+					glm::vec4(1.0)
+				);
+			//}
+
+			spriteVBO.setData(controls);
+
+			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, controls.size());
+
+			glfwSwapBuffers(window);
+			glfwPollEvents();
 		}
 	}
 

@@ -13,13 +13,15 @@ out vec4 Tint;
 
 uniform float time;
 
-uniform bool Shake;
-uniform bool Invert;
+uniform uint Flags;
 
 void main() {
 	vec2 adjVertex = vertex + vec2(0.5, 0.5);
 
 	gl_Position = transform * vec4(vertex, 0.0, 1.0);
+
+	bool Shake = (Flags & uint(32)) > uint(0);
+    bool Invert = (Flags & uint(64)) > uint(0);
 
 	if (Shake) {
 		gl_Position.x += cos(time * 21) * 0.02;

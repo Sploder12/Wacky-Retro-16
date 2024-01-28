@@ -10,5 +10,9 @@
 
   "v8": "real_v8.mp3",
 
-  "oh_no": "OH_NO.mp3"
+  "oh_no": "OH_NO.mp3",
+
+  "start": "ding_sound_for_starting_game.mp3",
+
+  "glass": "Glass_Break_Sound.mp3"
 }

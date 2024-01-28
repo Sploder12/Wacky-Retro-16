@@ -22,7 +22,8 @@ void main() {
     bool Posterize = (Flags & uint(4)) > uint(0);
     bool Warp = (Flags & uint(8)) > uint(0);
     bool MegaWarp = (Flags & uint(16)) > uint(0);
-    bool Invert = (Flags & uint(32)) > uint(0);
+    bool Shake = (Flags & uint(32)) > uint(0);
+    bool Invert = (Flags & uint(64)) > uint(0);
 
     vec2 texCoords = coords;
 

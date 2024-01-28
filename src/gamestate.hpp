@@ -144,6 +144,10 @@ struct Gamestate {
 					tilted = true;
 					megaWarping = std::abs(rotation) >= 90.0;
 
+					if (megaWarping) {
+						audioSkipping = true;
+					}
+
 					if (animFrame % 21 == 0) {
 						static std::random_device rd;
 						static std::mt19937 gen(rd());

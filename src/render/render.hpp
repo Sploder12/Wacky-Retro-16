@@ -93,7 +93,7 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
         std::vector<SpriteData> obstacles{};
         obstacles.reserve(state.track.size());
 
-        for (size_t x = 0; x < state.track.size(); ++x) {
+        for (size_t x = std::ceil(state.pos.x) - 2; x < state.track.size(); ++x) {
 
             const auto& ob = state.track[x];
 
