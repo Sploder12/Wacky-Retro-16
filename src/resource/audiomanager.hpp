@@ -27,7 +27,7 @@ public:
 		carNoises.setPos(glm::vec3(0.0f));
 		sfx.setPos(glm::vec3(0.0f));
 
-		context.setVolume(0.4);
+		context.setVolume(1.0);
 
 		bgm.setParam(AL_LOOPING, AL_TRUE);
 	}

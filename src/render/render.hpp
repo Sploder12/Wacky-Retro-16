@@ -55,7 +55,7 @@ inline void initRenderer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-inline void render(Gamestate& state, ResourceState& resources, float time) {
+inline void render(Gamestate& state, ResourceState& resources, float time, int mWidth, int mHeight) {
     resources.shaders.setTime(time);
 
     glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
@@ -71,6 +71,8 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
 
     if (state.state == State::Game || state.state == State::GameOver) {
         glBindFramebuffer(GL_FRAMEBUFFER, gameFBO);
+
+        glViewport(0, 0, 800, 600);
 
         glClearColor(0.0f, 0.2f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -143,6 +145,8 @@ inline void render(Gamestate& state, ResourceState& resources, float time) {
         //glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        glViewport(0, 0, mWidth * 0.75f, mHeight * 0.75f);
 
         auto& post = resources.shaders.getShader("post");
         post.use();

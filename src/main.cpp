@@ -136,7 +136,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-	
+	//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	
 	
 
@@ -191,7 +191,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 
 			glfwSetWindowPos(window, (mWidth / 2) - (width * 0.75f / 2), (mHeight / 2) - (height * 0.75f / 2));
-			glfwSetWindowSize(window, width * 0.75f, height * 0.75f);
+			glfwSetWindowSize(window, std::max(1.0f, width * 0.75f), std::max(1.0f, height * 0.75f));
 
 			glViewport(0, 0, width * 0.75f, height * 0.75f);
 
@@ -220,7 +220,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	}
 
 	glfwSetWindowPos(window, (mWidth / 2) - (mWidth * 0.75f / 2), (mHeight / 2) - (mHeight * 0.75f / 2));
-	glfwSetWindowSize(window, mWidth * 0.75f, mHeight * 0.75f);
+	glfwSetWindowSize(window, std::max(1.0f, mWidth * 0.75f), std::max(1.0f, mHeight * 0.75f));
 	glViewport(0, 0, mWidth * 0.75f, mHeight * 0.75f);
 
 	window.dims = glm::vec2(mWidth, mHeight);
@@ -378,7 +378,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 		}
 
 		state.update(dt, resources);
-		render(state, resources, now);
+		render(state, resources, now, mWidth, mHeight);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
