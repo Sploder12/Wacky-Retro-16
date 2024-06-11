@@ -139,7 +139,7 @@ namespace sndx {
 			}
 
 			auto format = formatFromChannels(outImg.channels);
-			outAtlas.tex = textureFromImage(std::move(outImg), format, GL_NEAREST);
+			outAtlas.tex = textureFromImage(std::move(outImg), format, GL_LINEAR);
 
 			return outAtlas;
 		}

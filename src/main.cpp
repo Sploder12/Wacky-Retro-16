@@ -6,12 +6,19 @@
 #include <sndx/render/imagedata.hpp>
 
 #include <thread>
+#include <functional>
 
 #include "render/render.hpp"
 
 #include "resource/resourcestate.hpp"
 
+#define MINIMP3_IMPLEMENTATION
+#include <minimp3/minimp3.h>
+#include <minimp3/minimp3_ex.h>
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
 
 ResourceState resources{};
 
@@ -127,7 +134,22 @@ float bounceInEasing(float x) {
 	return n1 * (x -= 2.625f / d1) * x + 0.984375f;
 }
 
+void framebuffer_size_callback(GLFWwindow* windo, int width, int height) {
+	window.resize(glm::ivec2(width, height));
+	window.setViewport();
+}
+
+std::function<void()> loop;
+void main_loop() {
+	loop();
+}
+
+#ifdef __EMSCRIPTEN__
+int main() {
+#else
+#include <Windows.h>
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd) {
+#endif
 
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -138,10 +160,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	//glfwWindowHint(GLFW_DECORATED, GLFW_FALSE);
 	
-	
 
-
-	
 	GLFWmonitor* monitor = glfwGetPrimaryMonitor();
 
 	int mpX, mpY;
@@ -179,213 +198,233 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	resources.textures.loadTexture("intro", "resources/textures/intro.png");
 
-	static constexpr bool intro = true;
+	//static constexpr bool intro = true;
 
-	if (intro) {
-		for (float percent = 0.01f; percent <= 1.0f; percent += 0.01f) {
-			auto x = bounceInEasing(percent);
+	loop = [&]() {
+		static float ipercent = 0.01f;
 
-
-			auto width = x * mWidth;
-			auto height = x * mHeight;
+		auto x = bounceInEasing(ipercent);
 
 
-			glfwSetWindowPos(window, (mWidth / 2) - (width * 0.75f / 2), (mHeight / 2) - (height * 0.75f / 2));
-			glfwSetWindowSize(window, std::max(1.0f, width * 0.75f), std::max(1.0f, height * 0.75f));
+		auto width = x * mWidth;
+		auto height = x * mHeight;
 
-			glViewport(0, 0, width * 0.75f, height * 0.75f);
+		glfwSetWindowPos(window, (mWidth / 2) - (width * 0.75f / 2), (mHeight / 2) - (height * 0.75f / 2));
+		glfwSetWindowSize(window, std::max(1.0f, width * 0.75f), std::max(1.0f, height * 0.75f));
 
-			spriteVAO.bind();
+		glViewport(0, 0, width * 0.75f, height * 0.75f);
 
-			const auto& shader = resources.shaders.getShader("sprite");
-			shader.use();
+		spriteVAO.bind();
+
+		const auto& shader = resources.shaders.getShader("sprite");
+		shader.use();
+
+		const auto& intro = resources.textures.getTexture("intro");
+		intro.bind();
+
+		SpriteData data{
+			glm::scale(glm::mat4(1.0f), glm::vec3(2.0f)),
+			resources.textures.getTexcoords("intro"),
+			glm::vec4(1.0f)
+		};
+
+		spriteVBO.setData(std::array<SpriteData, 1>{ data });
+
+		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+
+		glfwSwapBuffers(window);
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+		ipercent += 0.01f;
+
+		if (ipercent > 1.0f) {
+			glfwSetWindowPos(window, (mWidth / 2) - (mWidth * 0.75f / 2), (mHeight / 2) - (mHeight * 0.75f / 2));
+			glfwSetWindowSize(window, std::max(1.0f, mWidth * 0.75f), std::max(1.0f, mHeight * 0.75f));
+			glViewport(0, 0, mWidth * 0.75f, mHeight * 0.75f);
+
+			window.dims = glm::vec2(mWidth, mHeight);
+
+			static double start = glfwGetTime();
+
+			// LOAD RESOURCES HERE
+			loadAudioResource("resources/sounds.json", resources.sounds);
+
+			// PLEASE
+			resources.sounds.bgm.setGain(0.75f);
+			resources.sounds.setBGM("menu");
+
+			loadTextureResource("resources/sprites.json", resources.textures);
+
 
 			const auto& intro = resources.textures.getTexture("intro");
 			intro.bind();
 
-			SpriteData data{
-				glm::scale(glm::mat4(1.0f), glm::vec3(2.0f)),
-				resources.textures.getTexcoords("intro"),
-				glm::vec4(1.0f)
+			loop = [&]() { // we do a little loading screen
+
+				glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+				glfwSwapBuffers(window);
+				glfwPollEvents();
+
+				if (!(glfwGetTime() - start < 1.0)) {
+					static float percent = 1.0f;
+
+					loop = [&]() {
+				
+						glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
+						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+						intro.bind();
+						SpriteData data{
+							glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(glm::vec3(-0.21f, 0.3f, 0.0f), glm::vec3(0.0), percent)), glm::mix(glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(2.0), percent)),
+							resources.textures.getTexcoords("intro"),
+							glm::vec4(1.0)
+						};
+
+						spriteVBO.setData(std::array<SpriteData, 1>{ data });
+
+						glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+
+						glfwSwapBuffers(window);
+						glfwPollEvents();
+
+						std::this_thread::sleep_for(std::chrono::milliseconds(5));
+
+						percent -= 0.005f;
+
+						if (percent < 0.0f) {
+							start = glfwGetTime() - resources.sounds.bgm.tell().count();
+
+							loop = [&]() {
+								glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
+								glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+								intro.bind();
+								SpriteData data{
+									glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-0.21f, 0.3f, 0.0f)), glm::vec3(1.2f, 1.0f, 1.0f)),
+									resources.textures.getTexcoords("intro"),
+									glm::vec4(1.0)
+								};
+
+								spriteVBO.setData(std::array<SpriteData, 1>{ data });
+
+								glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+
+								glfwSwapBuffers(window);
+								glfwPollEvents();
+
+								if (glfwGetTime() - start >= 4.8) {
+									loop = [&]() {
+										glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
+										glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+										intro.bind();
+										SpriteData data{
+											glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-0.21f, 0.3f, 0.0f)), glm::vec3(1.2f, 1.0f, 1.0f)),
+											resources.textures.getTexcoords("intro"),
+											glm::vec4(1.0)
+										};
+
+										spriteVBO.setData(std::array<SpriteData, 1>{ data });
+
+										glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
+
+										resources.textures.getTexture("controls.WeAreSoBack").bind();
+										std::vector<SpriteData> controls{};
+
+										controls.emplace_back(
+											glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.f, 0.0f)), glm::vec3(1.0f, 1.0f, 1.0f)),
+											resources.textures.getTexcoords("controls.jump"),
+											glm::vec4(1.0)
+										);
+
+										//if (glfwGetTime() - start > glm::mix(4.8f, 9.7f, 0.5f)) {
+										controls.emplace_back(
+											glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, 0.0f)), glm::vec3(1.0f, 1.0f, 1.0f)),
+											resources.textures.getTexcoords("controls.tilt"),
+											glm::vec4(1.0)
+										);
+										//}
+
+										spriteVBO.setData(controls);
+
+										glDrawArraysInstanced(GL_TRIANGLES, 0, 6, controls.size());
+
+										glfwSwapBuffers(window);
+										glfwPollEvents();
+
+										if (glfwGetTime() - start >= 9.7) {
+											// setup callbacks
+
+											glfwSetCursorPosCallback(window, cursor_position_callback);
+											glfwSetMouseButtonCallback(window, mouse_callback);
+											glfwSetKeyCallback(window, key_callback);
+
+											//glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+											resources.sounds.setSpeed(1.0);
+
+											static double prev = glfwGetTime();
+
+											glfwSwapInterval(1);
+
+											static double skipTimer = prev;
+
+											loop = [&]() {
+												double now = glfwGetTime();
+
+												double dt = std::min(now - prev, 0.1);
+												prev = now;
+
+												if (state.audioSkipping && now - skipTimer >= 0.2) {
+													resources.sounds.bgmSkip(-(now - skipTimer) * 0.99);
+													skipTimer = now;
+												}
+
+												if (state.state != State::Game) {
+													lrotating = false;
+													rrotating = false;
+												}
+
+												if (lrotating && !rrotating) {
+													state.rotation += 60.0f * dt;
+												}
+												else if (rrotating && !lrotating) {
+													state.rotation -= 60.0f * dt;
+												}
+
+												if (state.rotation > 180.0f) {
+													state.rotation = -180.0;
+												}
+												else if (state.rotation < -180.0f) {
+													state.rotation = 180.0;
+												}
+
+												state.update(dt, resources);
+												render(state, resources, now, mWidth, mHeight);
+
+												glfwSwapBuffers(window);
+												glfwPollEvents();
+
+												glFinish();
+											};
+										}
+									};
+								}
+							};
+						}
+					};
+				}
 			};
-
-			spriteVBO.setData(std::array<SpriteData, 1>{ data });
-
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-
-			glfwSwapBuffers(window);
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
-	}
-
-	glfwSetWindowPos(window, (mWidth / 2) - (mWidth * 0.75f / 2), (mHeight / 2) - (mHeight * 0.75f / 2));
-	glfwSetWindowSize(window, std::max(1.0f, mWidth * 0.75f), std::max(1.0f, mHeight * 0.75f));
-	glViewport(0, 0, mWidth * 0.75f, mHeight * 0.75f);
-
-	window.dims = glm::vec2(mWidth, mHeight);
-
-	double start = glfwGetTime();
+	};
 	
-	// LOAD RESOURCES HERE
-	loadTextureResource("resources/sprites.json", resources.textures);
-	loadAudioResource("resources/sounds.json", resources.sounds);
-
-	// PLEASE
-	resources.sounds.bgm.setGain(0.75f);
-	resources.sounds.setBGM("menu");
-
-	if (intro) {
-		const auto& intro = resources.textures.getTexture("intro");
-		intro.bind();
-
-		while (glfwGetTime() - start < 1.0 && !glfwWindowShouldClose(window)) { // we do a little loading screen
-		
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		}
-
-		
-		for (float percent = 1.0f; percent >= 0.0f && !glfwWindowShouldClose(window); percent -= 0.005f) {
-
-			glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-			intro.bind();
-			SpriteData data{
-				glm::scale(glm::translate(glm::mat4(1.0f), glm::mix(glm::vec3(-0.21f, 0.3f, 0.0f), glm::vec3(0.0), percent)), glm::mix(glm::vec3(1.2f, 1.0f, 1.0f), glm::vec3(2.0), percent)),
-				resources.textures.getTexcoords("intro"),
-				glm::vec4(1.0)
-			};
-
-			spriteVBO.setData(std::array<SpriteData, 1>{ data });
-
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(5));
-		}
-
-		start = glfwGetTime() - resources.sounds.bgm.tell().count();
-
-		while (glfwGetTime() - start < 4.8 && !glfwWindowShouldClose(window)) { // we do a little loading screen
-
-			glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			intro.bind();
-			SpriteData data{
-				glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-0.21f, 0.3f, 0.0f)), glm::vec3(1.2f, 1.0f, 1.0f)),
-				resources.textures.getTexcoords("intro"),
-				glm::vec4(1.0)
-			};
-
-			spriteVBO.setData(std::array<SpriteData, 1>{ data });
-
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		}
-
-		while (glfwGetTime() - start < 9.7 && !glfwWindowShouldClose(window)) { // we do a little loading screen
-
-			glClearColor(0.03f, 0.04f, 0.05f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			intro.bind();
-			SpriteData data{
-				glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(-0.21f, 0.3f, 0.0f)), glm::vec3(1.2f, 1.0f, 1.0f)),
-				resources.textures.getTexcoords("intro"),
-				glm::vec4(1.0)
-			};
-
-			spriteVBO.setData(std::array<SpriteData, 1>{ data });
-
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, 1);
-
-			resources.textures.getTexture("controls.WeAreSoBack").bind();
-			std::vector<SpriteData> controls{};
-
-			controls.emplace_back(
-				glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.f, 0.0f)), glm::vec3(1.0f, 1.0f, 1.0f)),
-				resources.textures.getTexcoords("controls.jump"),
-				glm::vec4(1.0)
-			);
-
-			//if (glfwGetTime() - start > glm::mix(4.8f, 9.7f, 0.5f)) {
-				controls.emplace_back(
-					glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, -0.5f, 0.0f)), glm::vec3(1.0f, 1.0f, 1.0f)),
-					resources.textures.getTexcoords("controls.tilt"),
-					glm::vec4(1.0)
-				);
-			//}
-
-			spriteVBO.setData(controls);
-
-			glDrawArraysInstanced(GL_TRIANGLES, 0, 6, controls.size());
-
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		}
-	}
-
-	// setup callbacks
-
-	glfwSetCursorPosCallback(window, cursor_position_callback);
-	glfwSetMouseButtonCallback(window, mouse_callback);
-	glfwSetKeyCallback(window, key_callback);
-
-	resources.sounds.setSpeed(1.0);
-
-	double prev = glfwGetTime();
-
-	glfwSwapInterval(1);
-
-	double skipTimer = prev;
-
+	#ifdef __EMSCRIPTEN__
+	emscripten_set_main_loop(main_loop, 0, true);
+	#else
 	while (!glfwWindowShouldClose(window)) {
-
-		double now = glfwGetTime();
-
-		double dt = std::min(now - prev, 0.1);
-		prev = now;
-
-		if (state.audioSkipping && now - skipTimer >= 0.2) {
-			resources.sounds.bgmSkip(-(now - skipTimer) * 0.99);
-			skipTimer = now;
-		}
-
-		if (state.state != State::Game) {
-			lrotating = false;
-			rrotating = false;
-		}
-
-		if (lrotating && !rrotating) {
-			state.rotation += 60.0f * dt;
-		}
-		else if (rrotating && !lrotating) {
-			state.rotation -= 60.0f * dt;
-		}
-
-		if (state.rotation > 180.0f) {
-			state.rotation = -180.0;
-		}
-		else if (state.rotation < -180.0f) {
-			state.rotation = 180.0;
-		}
-
-		state.update(dt, resources);
-		render(state, resources, now, mWidth, mHeight);
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-
-		glFinish();
+		loop();
 	}
-	
+	#endif	
 
 	resources.clear();
 

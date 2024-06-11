@@ -3,12 +3,16 @@
 #include <sndx/util/stringmanip.hpp>
 #include <sndx/data.hpp>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 
+#ifndef __EMSCRIPTEN__
 #define __STDC_LIB_EXT1__
+#define STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
+#endif
+
+#include <stb_image.h>
 #include <stb_image_write.h>
+
 
 #include <future>
 

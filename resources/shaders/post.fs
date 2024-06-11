@@ -1,4 +1,7 @@
-#version 330 core
+#version 300 es
+
+precision mediump float;
+precision mediump int;
 
 in vec2 coords;
 
@@ -28,13 +31,13 @@ void main() {
     vec2 texCoords = coords;
 
     if (MegaWarp) {
-        texCoords.x += sin(542353 * texCoords.y + texCoords.x) * 0.2;
-        texCoords.y += sin(time + texCoords.y + texCoords.x * 23457) * 0.1;
+        texCoords.x += sin(22353.0 * texCoords.y + texCoords.x) * 0.2;
+        texCoords.y += sin(time + texCoords.y + texCoords.x * 2457.0) * 0.1;
     }
 
     if (Warp) {
-        texCoords.x += sin(13 * texCoords.y + texCoords.x) * 0.2;
-        texCoords.y += sin(time + texCoords.y + texCoords.x * 7) * 0.1 - 0.1;
+        texCoords.x += sin(13.0 * texCoords.y + texCoords.x) * 0.2;
+        texCoords.y += sin(time + texCoords.y + texCoords.x * 7.0) * 0.1 - 0.1;
     }
 
     // adapted from https://learnopengl.com/Advanced-OpenGL/Framebuffers
@@ -61,9 +64,9 @@ void main() {
 
     if (Edge) {
         float edgeKernel[9] = float[](
-            1, 1, 1,
-            1,  -8, 1,
-            1, 1, 1
+            1.0, 1.0, 1.0,
+            1.0,  -8.0, 1.0,
+            1.0, 1.0, 1.0
         );
 
         effects += 1.0;
@@ -75,9 +78,9 @@ void main() {
 
     if (Blur) {
         float blurKernel[9] = float[](
-            1.0 / 16, 2.0 / 16, 1.0 / 16,
-            2.0 / 16, 4.0 / 16, 2.0 / 16,
-            1.0 / 16, 2.0 / 16, 1.0 / 16  
+            1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0,
+            2.0 / 16.0, 4.0 / 16.0, 2.0 / 16.0,
+            1.0 / 16.0, 2.0 / 16.0, 1.0 / 16.0  
         );
 
         effects += 1.0;

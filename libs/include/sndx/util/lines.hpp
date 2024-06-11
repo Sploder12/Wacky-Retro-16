@@ -94,7 +94,7 @@ namespace sndx {
 
 		using T = typename Container::value_type;
 
-		static constexpr auto facts = factorials<n>();
+		constexpr auto facts = factorials<n>();
 
 		T out = T(0.0);
 

@@ -72,7 +72,7 @@ inline void render(Gamestate& state, ResourceState& resources, float time, int m
     if (state.state == State::Game || state.state == State::GameOver) {
         glBindFramebuffer(GL_FRAMEBUFFER, gameFBO);
 
-        glViewport(0, 0, 800, 600);
+        //glViewport(0, 0, 800, 600);
 
         glClearColor(0.0f, 0.2f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

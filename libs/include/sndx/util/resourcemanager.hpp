@@ -6,11 +6,6 @@
 
 namespace sndx {
 
-	template <class T>
-	decltype(auto) destroy(T& obj) {
-		return obj.destroy();
-	}
-
 	template <class ResourceT, class IndexT = std::string, template<class, class> class InternalStorageT = std::unordered_map>
 	class ResourceManager : public InternalStorageT<IndexT, ResourceT> {
 	public:
@@ -26,9 +21,9 @@ namespace sndx {
 		ResourceManager& operator=(ResourceManager&&) = default;
 
 		void clear() {
-			if constexpr (requires(ResourceT obj) { sndx::destroy<ResourceT>(obj); }) {
+			if constexpr (requires(ResourceT obj) { obj.destroy(); }) {
 				for (auto& [id, obj] : *this) {
-					destroy(obj);
+					obj.destroy();
 				}
 			}
 
@@ -58,9 +53,9 @@ namespace sndx {
 		}
 
 		void clear() {
-			if constexpr (requires(ResourceT obj) { sndx::destroy<ResourceT>(obj); }) {
+			if constexpr (requires(ResourceT obj) { obj.destroy(); }) {
 				for (auto& [id, obj] : *this) {
-					destroy(obj);
+					obj.destroy();
 				}
 			}
 

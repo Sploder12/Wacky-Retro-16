@@ -3,6 +3,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+#include <optional>
+#include <array>
 
 namespace sndx {
 	template <typename CharT = char>
@@ -12,7 +14,7 @@ namespace sndx {
 	using Str = std::basic_string<CharT>;
 
 	[[nodiscard]]
-	inline constexpr auto strip(sv<char> str, sv<char> strips = " \t") {
+	inline constexpr auto strip(sv<char> str, sv<char> strips = " \t\r") {
 		auto first = str.find_first_not_of(strips);
 		auto last = str.find_last_not_of(strips);
 
@@ -24,7 +26,7 @@ namespace sndx {
 	}
 
 	[[nodiscard]]
-	inline constexpr std::pair<sv<char>, sv<char>> splitFirst(sv<char> str, char delim, sv<char> strips = " \t") {
+	inline constexpr std::pair<sv<char>, sv<char>> splitFirst(sv<char> str, char delim, sv<char> strips = " \t\r") {
 		auto end = str.find_first_of(delim);
 		sv<char> first, second;
 
@@ -41,7 +43,7 @@ namespace sndx {
 	}
 
 	[[nodiscard]]
-	inline std::vector<sv<char>> splitStrip(sv<char> str, char delim, sv<char> strips = " \t") {
+	inline std::vector<sv<char>> splitStrip(sv<char> str, char delim, sv<char> strips = " \t\r") {
 		std::vector<sv<char>> out{};
 		str = strip(str, strips);
 		if (str == "") return out;
@@ -116,6 +118,113 @@ namespace sndx {
 				out += cur;
 			}
 		}
+		return out;
+	}
+
+	using Codepoint = char32_t;
+
+	[[nodiscard]]
+	inline std::optional<std::basic_string<Codepoint>> decodeUTF8(std::string_view str) {
+		std::basic_string<Codepoint> out{};
+		out.reserve(str.size());
+
+		for (size_t i = 0; i < str.size(); ++i) {
+			auto chr = str[i];
+
+			if ((chr & 0b10000000) == 0) {
+				out.push_back(Codepoint(chr));
+				continue;
+			}
+
+			Codepoint cur = 0;
+
+			auto len = 0;
+			if ((chr & 0b11100000) == 0b11000000) {
+				len = 2;
+				cur = chr & 0b00011111;
+			}
+			else if ((chr & 0b11110000) == 0b11100000) {
+				len = 3;
+				cur = chr & 0b00001111;
+			}
+			else if ((chr & 0b11111000) == 0b11110000) {
+				len = 4;
+				cur = chr & 0b00000111;
+			}
+			else {
+				return std::nullopt;
+			}
+
+			cur <<= 6;
+
+			if (i + len - 1 >= str.size()) 
+				return std::nullopt;
+
+			for (size_t j = 1; j < len; ++j) {
+				auto b = str[i + j];
+
+				if ((b & 0b11000000) != 0b10000000)
+					return std::nullopt;
+
+				cur |= b & 0b00111111;
+
+				if (j != len - 1) {
+					cur <<= 6;
+				}
+			}
+
+			out.push_back(cur);
+			i += len - 1;
+		}
+
+		return out;
+	}
+
+	[[nodiscard]]
+	inline std::optional<std::string> encodeUTF8(std::basic_string_view<Codepoint> str) {
+		std::string out{};
+		out.reserve(str.size() * 4);
+
+		for (auto codepoint : str) {
+			if (codepoint > 0x10FFFF) return std::nullopt;
+
+			if (codepoint <= 0x007F) { // 1 byte
+				out.push_back(static_cast<char>(codepoint));
+				continue;
+			}
+
+			std::array<char, 3> endBytes{};
+			
+			static constexpr auto getLast = [](Codepoint codepoint) {
+				return (codepoint & 0b00111111) | 0b10000000;
+			};
+
+			auto tmpPoint = codepoint;
+			for (auto& b : endBytes) {
+				b = getLast(tmpPoint);
+				tmpPoint >>= 6;
+			}
+
+			
+			if (codepoint <= 0x07FF) { // 2 byte
+				out.push_back(static_cast<char>((codepoint >> 6) | 0b11000000));
+			}
+			else if (codepoint <= 0xFFFF) { // 3 byte
+				out.push_back(static_cast<char>((codepoint >> 12) | 0b11100000));
+			}
+			else { // 4 byte
+				out.push_back(static_cast<char>((codepoint >> 18) | 0b11110000));
+			}
+
+			for (auto it = endBytes.rbegin(); it != endBytes.rend(); ++it) {
+				if ((*it & 0b00111111) == 0) {
+					break;
+				}
+
+				out.push_back(*it);
+			}
+		}
+
 		return out;
 	}
 }

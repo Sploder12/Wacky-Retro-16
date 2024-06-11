@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 #include <glm/glm.hpp>
 
@@ -16,7 +16,7 @@ namespace sndx {
 	template <typename T>
 	using is_GLnormalized = std::bool_constant <
 		requires (T) {
-		std::same_as<T::normalized, std::bool_constant<true>>;
+		std::same_as<typename T::normalized, std::bool_constant<true>>;
 	} >;
 
 	template <typename T>

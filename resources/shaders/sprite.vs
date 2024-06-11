@@ -1,4 +1,7 @@
-#version 330 core
+#version 300 es
+
+precision mediump float;
+precision mediump int;
 
 layout(location = 0) in vec2 vertex;
 

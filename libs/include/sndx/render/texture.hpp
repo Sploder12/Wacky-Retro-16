@@ -1,6 +1,6 @@
 #pragma once
 
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 #include <glm/glm.hpp>
 
@@ -12,7 +12,7 @@ namespace sndx {
 	constexpr GLenum formatFromChannels(int channels) {
 		switch (channels) {
 		case 1:
-			return GL_RED;
+			return GL_ALPHA;
 		case 2:
 			return GL_RG;
 		case 3:
@@ -28,7 +28,7 @@ namespace sndx {
 	[[nodiscard]]
 	constexpr int channelsFromFormat(GLenum format) {
 		switch (format) {
-		case GL_RED:
+		case GL_ALPHA:
 			return 1;
 		case GL_RG:
 			return 2;
@@ -50,7 +50,7 @@ namespace sndx {
 		constexpr explicit Texture() :
 			id(0), width(0), height(0), channels(0) {}
 
-		Texture(size_t width, size_t height, const void* data, GLenum iformat, GLenum format, GLenum filter) :
+		Texture(size_t width, size_t height, const void* data, GLenum iformat, GLenum format, GLenum filter, GLenum type = GL_TEXTURE_2D) :
 			width(width), height(height), channels(channelsFromFormat(iformat)) {
 
 			if (width <= 0 || height <= 0) [[unlikely]] {
@@ -67,13 +67,13 @@ namespace sndx {
 			glBindTexture(type, 0);
 		}
 
-		Texture(size_t width, size_t height, GLenum iformat, GLenum filter) :
-			Texture(width, height, NULL, iformat, iformat, filter) {}
+		Texture(size_t width, size_t height, GLenum iformat, GLenum filter, GLenum type = GL_TEXTURE_2D) :
+			Texture(width, height, NULL, iformat, iformat, filter, type) {}
 
 		void bind(size_t tex = 0) const {
 			assert(tex <= 31);
-			//glActiveTexture(GLenum(GL_TEXTURE0 + tex));
-			glBindTexture(GL_TEXTURE_2D, id);
+			glActiveTexture(GLenum(GL_TEXTURE0 + tex));
+			glBindTexture(type, id);
 		}
 
 		void destroy() {

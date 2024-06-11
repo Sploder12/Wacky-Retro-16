@@ -25,11 +25,7 @@ namespace sndx {
 			if (in.size() == 1) [[unlikely]]
 				return "\"";
 
-			std::stringstream ss;
-			ss << in;
-			std::string out;
-			ss >> std::quoted(out);
-			return std::move(out);
+			return parseEscaped(in.substr(1, in.size() - 2));
 		}
 
 		if (in == "true") {
@@ -56,7 +52,7 @@ namespace sndx {
 	template <GenericEncodingScheme scheme>
 	class GenericDecoder {
 	protected:
-		static constexpr char strips_cstr[4] = { ' ', scheme.spacer, scheme.depthSpacer, '\0'};
+		static constexpr char strips_cstr[5] = { ' ', scheme.spacer, scheme.depthSpacer, '\r', '\0'};
 		static constexpr auto strips = std::string_view(strips_cstr);
 
 		[[nodiscard]] // precondition, str.front() is the start of the quoted string
@@ -77,6 +73,9 @@ namespace sndx {
 				}
 				else if (cur == '"' && !escaped) {
 					return i;
+				}
+				else if (escaped) {
+					escaped = false;
 				}
 			}
 
@@ -169,7 +168,14 @@ namespace sndx {
 			for (size_t i = 0; i < arr.size(); ++i) {
 				char cur = arr[i];
 
-				if (cur == scheme.beginDir) {
+				if (cur == '"') {
+					size_t e = find_quote_end(arr.substr(i));
+					if (e == -1) [[unlikely]]
+						return out;
+
+					i += e;
+				}
+				else if (cur == scheme.beginDir) {
 					size_t e = find_dict_end(arr.substr(i));
 					if (e == -1) [[unlikely]]
 						return out;
@@ -235,19 +241,20 @@ namespace sndx {
 					i += e;
 					ebegin = -1;
 				}
-				else if (cur == '"' && !hasKey) {
+				else if (cur == '"') {
 					size_t e = find_quote_end(dict.substr(i));
 					if (e == -1) [[unlikely]]
 						return out;
 
-					auto in = dict.substr(i + 1, e - 1);
-					std::stringstream ss;
-					ss << in;
-					ss >> std::quoted(key);
-					hasKey = true;
+					if (!hasKey) {
+						auto in = dict.substr(i + 1, e - 1);
+						key = parseEscaped(in);
+						hasKey = true;
+
+						ebegin = -1;
+					}
 
 					i += e;
-					ebegin = -1;
 				}
 				else if (cur == scheme.keyDelim) {
 					if (!hasKey) [[unlikely]]

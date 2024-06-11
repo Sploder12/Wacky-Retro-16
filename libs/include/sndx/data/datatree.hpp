@@ -253,7 +253,7 @@ namespace sndx {
 		template <class T> [[nodiscard]]
 		T* get(size_t index) {
 			if (auto elem = get(index); elem) {
-				return elem->get<T>();
+				return elem->template get<T>();
 			}
 
 			return nullptr;
@@ -262,7 +262,7 @@ namespace sndx {
 		template <class T> [[nodiscard]]
 		const T* get(size_t index) const {
 			if (auto elem = get(index); elem) {
-				return elem->get<T>();
+				return elem->template get<T>();
 			}
 
 			return nullptr;
@@ -293,7 +293,7 @@ namespace sndx {
 		template <class T> [[nodiscard]]
 		T* get(const std::string& key) {
 			if (auto elem = get(key); elem) {
-				return elem->get<T>();
+				return elem->template get<T>();
 			}
 
 			return nullptr;
@@ -302,7 +302,7 @@ namespace sndx {
 		template <class T> [[nodiscard]]
 		const T* get(const std::string& key) const {
 			if (auto elem = get(key); elem) {
-				return elem->get<T>();
+				return elem->template get<T>();
 			}
 
 			return nullptr;
@@ -344,7 +344,7 @@ namespace sndx {
 				|| (std::convertible_to<std::decay_t<Args>, size_t>)) && ...)) {
 
 			if (auto elem = get(first, args...); elem) {
-				return elem->get<T>();
+				return elem->template get<T>();
 			}
 
 			return nullptr;
@@ -358,7 +358,7 @@ namespace sndx {
 				|| (std::convertible_to<std::decay_t<Args>, size_t>)) && ...)) {
 
 			if (auto elem = get(first, args...); elem) {
-				return elem->get<T>();
+				return elem->template get<T>();
 			}
 
 			return nullptr;

@@ -1,4 +1,7 @@
-#version 330 core
+#version 300 es
+
+precision mediump float;
+precision mediump int;
 
 layout(location = 0) in vec2 vertex;
 
@@ -24,8 +27,8 @@ void main() {
     bool Invert = (Flags & uint(64)) > uint(0);
 
 	if (Shake) {
-		gl_Position.x += cos(time * 21) * 0.02;
-		gl_Position.y += cos(time * 23) * 0.02;
+		gl_Position.x += cos(time * 21.0) * 0.02;
+		gl_Position.y += cos(time * 23.0) * 0.02;
 	}
 
 	coords = (adjVertex * texoff.zw) + texoff.xy;
