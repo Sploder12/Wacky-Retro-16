@@ -288,9 +288,12 @@ inline void render(Gamestate& state, ResourceState& resources, float time, int m
         if (state.timer >= truckTime - 0.4 && state.pos.y < -0.2 && state.pos.y > -10.0) {
             state.pos.y = -10.1;
 
-            resources.sounds.sfx.stop();
-            resources.sounds.sfx.setBuffer(resources.sounds.at("glass"));
-            resources.sounds.sfx.setGain(1.0).setSpeed(1.0).play();
+            try {
+                resources.sounds.sfx.stop();
+                resources.sounds.sfx.setBuffer(resources.sounds.at("glass"));
+                resources.sounds.sfx.setGain(1.0).setSpeed(1.0).play();
+            }
+            catch (...) {}
         }
 
         deathStuff.emplace_back(
@@ -310,7 +313,10 @@ inline void render(Gamestate& state, ResourceState& resources, float time, int m
         if (state.timer >= truckTime + 2.0 && state.pos.y == 5.0) {
             state.pos.y = 6.0;
 
-            resources.sounds.carNoises.setBuffer(resources.sounds.at("oh_no")).setGain(1.0).setParam(AL_LOOPING, AL_FALSE).play();
+            try {
+                resources.sounds.carNoises.setBuffer(resources.sounds.at("oh_no")).setGain(1.0).setParam(AL_LOOPING, AL_FALSE).play();
+            }
+            catch (...) {}
         }
 
         if (state.timer >= truckTime + 2.0) {

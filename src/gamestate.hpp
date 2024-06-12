@@ -225,9 +225,12 @@ struct Gamestate {
 				state = State::GameOver;
 				resources.sounds.bgm.stop();
 
-				resources.sounds.carNoises.stop();
-				resources.sounds.carNoises.setBuffer(resources.sounds["v8"]);
-				resources.sounds.carNoises.setParam(AL_LOOPING, AL_TRUE).setGain(0.1f).setSpeed(1.0).play();
+				try {
+					resources.sounds.carNoises.stop();
+					resources.sounds.carNoises.setBuffer(resources.sounds.at("v8"));
+					resources.sounds.carNoises.setParam(AL_LOOPING, AL_TRUE).setGain(0.1f).setSpeed(1.0).play();
+				}
+				catch (...) {}
 				timer = 0.0;
 			}
 
