@@ -373,7 +373,7 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 												double dt = std::min(now - prev, 0.1);
 												prev = now;
 
-												if (state.audioSkipping && now - skipTimer >= 0.2) {
+												if (state.audioSkipping && state.state == State::Game && now - skipTimer >= 0.2) {
 													try {
 														resources.sounds.bgmSkip(-(now - skipTimer) * 0.99);
 														skipTimer = now;
