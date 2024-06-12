@@ -374,8 +374,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 												prev = now;
 
 												if (state.audioSkipping && now - skipTimer >= 0.2) {
-													resources.sounds.bgmSkip(-(now - skipTimer) * 0.99);
-													skipTimer = now;
+													try {
+														resources.sounds.bgmSkip(-(now - skipTimer) * 0.99);
+														skipTimer = now;
+													}
+													catch (...) {}
 												}
 
 												if (state.state != State::Game) {
