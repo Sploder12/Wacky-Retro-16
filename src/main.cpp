@@ -168,9 +168,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 
 	glfwGetMonitorWorkarea(monitor, &mpX, &mpY, &mWidth, &mHeight);
 
-
-	
-
 	window = sndx::createWindow(1, 1, "EXTREME OFF-ROAD HILL CHALLENGE", float(mWidth) / float(mHeight));
 	glfwMakeContextCurrent(window);
 
@@ -248,13 +245,14 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 			static double start = glfwGetTime();
 
 			// LOAD RESOURCES HERE
+
+			loadTextureResource("resources/sprites.json", resources.textures);
+
 			loadAudioResource("resources/sounds.json", resources.sounds);
 
 			// PLEASE
 			resources.sounds.bgm.setGain(0.75f);
 			resources.sounds.setBGM("menu");
-
-			loadTextureResource("resources/sprites.json", resources.textures);
 
 
 			const auto& intro = resources.textures.getTexture("intro");
